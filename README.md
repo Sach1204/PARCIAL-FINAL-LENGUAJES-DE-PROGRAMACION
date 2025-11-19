@@ -1,7 +1,5 @@
 # PARCIAL-FINAL-LENGUAJES-DE-PROGRAMACION
 
-# Parser de Lenguaje de Programación para Matrices
-
 ## Punto 2
 
 ## GRAMÁTICA
