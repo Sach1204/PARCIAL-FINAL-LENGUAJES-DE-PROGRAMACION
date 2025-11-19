@@ -1,0 +1,25 @@
+Prog     → DeclList StmtList
+
+DeclList → Decl DeclList
+DeclList → ε
+
+Decl     → mat id '[' num ',' num ']' ';'
+
+StmtList → Stmt StmtList
+StmtList → ε
+
+Stmt     → Assign ';'
+
+Assign   → id '=' Expr
+
+Expr     → Expr '+' Term
+Expr     → Expr '-' Term
+Expr     → Term
+
+Term     → Term '*' Factor
+Term     → Factor
+
+Factor   → id
+Factor   → '(' Expr ')'
+
+
