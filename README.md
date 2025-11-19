@@ -467,3 +467,164 @@ Se esperaba ';' pero llegó 'mat' en posición 11
 ```
 
 ---
+# Punto 3
+
+## GRAMÁTICA ANTLR
+
+### **matrices.g4**
+
+```antlr
+grammar matrices;
+
+// -------------- Reglas de parser (minúsculas) --------------
+
+prog
+    : declList stmtList EOF
+    ;
+
+declList
+    : decl*
+    ;
+
+decl
+    : MAT ID '[' NUM ',' NUM ']' ';'
+    ;
+
+stmtList
+    : stmt*
+    ;
+
+stmt
+    : assign ';'
+    ;
+
+assign
+    : ID '=' expr
+    ;
+
+expr
+    : term (('+' | '-') term)*
+    ;
+
+term
+    : factor ('*' factor)*
+    ;
+
+factor
+    : ID
+    | '(' expr ')'
+    ;
+
+// -------------- Reglas léxicas (MAYÚSCULAS) --------------
+
+MAT : 'mat';
+
+ID  : [a-zA-Z_] [a-zA-Z_0-9]* ;
+
+NUM : [0-9]+ ;
+
+WS  : [ \t\r\n]+ -> skip ;
+
+LINE_COMMENT
+    : '//' ~[\r\n]* -> skip
+    ;
+```
+
+**Equivalencia con la gramática del Punto 2:**
+```
+prog      ≡ Prog → DeclList StmtList
+declList  ≡ DeclList → Decl*
+decl      ≡ Decl → mat id '[' num ',' num ']' ';'
+stmtList  ≡ StmtList → Stmt*
+stmt      ≡ Stmt → Assign ';'
+assign    ≡ Assign → id '=' Expr
+expr      ≡ Expr → Term ((+|-) Term)*
+term      ≡ Term → Factor ('*' Factor)*
+factor    ≡ Factor → id | '(' Expr ')'
+```
+
+---
+## CÓDIGO PYTHON
+
+### **parse_matrices.py**
+
+```python
+from antlr4 import FileStream, CommonTokenStream
+from matricesLexer import matricesLexer
+from matricesParser import matricesParser
+
+def main():
+    # Lee el programa de ejemplo
+    input_stream = FileStream("programa_ejemplo.txt", encoding="utf-8")
+
+    # Lexer y parser generados por ANTLR
+    lexer = matricesLexer(input_stream)
+    token_stream = CommonTokenStream(lexer)
+    parser = matricesParser(token_stream)
+
+    # Regla inicial de la gramática
+    tree = parser.prog()
+
+    # Si no hubo errores de sintaxis, llega aquí
+    print("El programa ES válido según la gramática (ANTLR).")
+
+main()
+```
+## ARCHIVO DE ENTRADA
+
+### **programa_ejemplo.txt**
+
+```
+mat A[2,3];
+mat B[3,4];
+mat C[2,4];
+
+C = A * B;
+C = A * B + C;
+```
+
+**Análisis:**
+
+| Línea | Código | Descripción |
+|-------|--------|-------------|
+| 1 | `mat A[2,3];` | Declara matriz A de 2×3 |
+| 2 | `mat B[3,4];` | Declara matriz B de 3×4 |
+| 3 | `mat C[2,4];` | Declara matriz C de 2×4 |
+| 5 | `C = A * B;` | Asigna a C el producto A×B |
+| 6 | `C = A * B + C;` | Asigna a C la suma (A×B)+C |
+
+**Resultado:** ✅ Programa VÁLIDO
+
+---
+## USO
+
+### **Requisitos**
+
+1. Python 
+
+### **Paso 1: Generar el Parser**
+
+```bash
+antlr4 -Dlanguage=Python3 matrices.g4
+```
+
+**Archivos generados:**
+- `matricesLexer.py`
+- `matricesParser.py`
+- `matricesListener.py`
+- `matricesVisitor.py`
+
+---
+
+### **Paso 2: Ejecutar**
+
+```bash
+python parse_matrices.py
+```
+
+**Salida:**
+```
+El programa ES válido según la gramática (ANTLR).
+```
+
+---
